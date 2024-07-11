@@ -1,0 +1,13 @@
+-- An SQL script that creates a stored procedure ComputeAverageWeightedScoreForUser.
+DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUser;
+DELIMITER //
+CREATE PROCEDURE ComputeAverageWeightedScoreForUser(IN userId INT)
+BEGIN
+	SET @userScores := (
+		SELECT SUM(corrections.score * projects.weight) / SUM(projects.weight)
+		FROM corrections
+		JOIN projects ON corrections.project_id = projects.id
+		WHERE corrections.user_id = userId);
+	UPDATE users SET average_score = @userScores WHERE id = userId;
+END //
+DELIMITER ;
